@@ -5,7 +5,6 @@
 #include <fun>
 #include <hamsandwich>
 #include <engine>
-#include <fakemeta>
 
 #define PLUGIN "Weapon Electro P90 [ZGS]"
 #define VERSION "1.0"
@@ -26,7 +25,6 @@ public plugin_precache(){
 	TrieSetCell(g_tClaseSprite, "worldspawn", 1) 
 	RegisterHam(Ham_TraceAttack, "player", "fw_TraceAttack", 1) 
 	TrieSetCell(g_tClaseSprite, "player", 1) 
-	register_forward(FM_Spawn, "Spawn", 1) 
 	
 	// Add your code here...
 	m_beamSpr = precache_model("sprites/laserbeam.spr")
@@ -38,7 +36,7 @@ public plugin_precache(){
 	register_clcmd("say /p90", "cmdSayP90")
 }
 
-public Spawn(iEnt) 
+public pfn_spawn(iEnt)
 { 
 	if(is_valid_ent(iEnt)) 
 	{
@@ -73,47 +71,48 @@ public fw_TraceAttack(victim, attacker, Float:damage, Float:direction[3], iTr, d
 		return HAM_IGNORED
 		
 	static Float:vecEndPos[3], Float:origin[3]; 
+	entiy
 	get_tr2(iTr, TR_vecEndPos, vecEndPos);
 	entity_get_vector(attacker, EV_VEC_origin, origin)
 	
 	emit_sound( attacker, CHAN_VOICE, g_sound_chispa[random_num(0,3)], 1.0, ATTN_NORM, 0, PITCH_NORM )
 	
-	engfunc(EngFunc_MessageBegin, MSG_BROADCAST,SVC_TEMPENTITY, vecEndPos, 0)
+	message_begin(MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0)
 	write_byte(TE_SPARKS)                      
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	message_end()
 		
-	engfunc(EngFunc_MessageBegin, MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0)
+	message_begin(MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0)
 	write_byte(TE_SPARKS)
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	message_end()
 	
 	new vec1[3]
 	get_user_origin(attacker, vec1, 1) // origin; your camera point.
 	
-	engfunc(EngFunc_MessageBegin, MSG_BROADCAST,SVC_TEMPENTITY, vecEndPos, 0)
+	message_begin(MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0)
 	write_byte(TE_ELIGHT)
 	write_short(attacker | 0x1000)
-	engfunc(EngFunc_WriteCoord, vec1[0])
-	engfunc(EngFunc_WriteCoord, vec1[1])
-	engfunc(EngFunc_WriteCoord, vec1[2])
-	engfunc(EngFunc_WriteCoord, 15)
+	write_coord(vec1[0])
+	write_coord(vec1[1])
+	write_coord(vec1[2])
+	write_coord(15)
 	write_byte(0)
 	write_byte(128)
 	write_byte(255)
 	write_byte(1)
-	engfunc(EngFunc_WriteCoord, 0)
+	write_coord(0)
 	message_end()
 		
-	engfunc(EngFunc_MessageBegin, MSG_ALL, SVC_TEMPENTITY, vecEndPos, 0)
+	message_begin(MSG_ALL, SVC_TEMPENTITY, vecEndPos, 0)
 	write_byte(TE_DLIGHT) // TE id
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	write_byte(12) // radius
 	write_byte(0) // r
 	write_byte(128) // g
@@ -122,12 +121,12 @@ public fw_TraceAttack(victim, attacker, Float:damage, Float:direction[3], iTr, d
 	write_byte(100) // decay rate
 	message_end()
 		
-	engfunc(EngFunc_MessageBegin, MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0)
+	message_begin(MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0)
 	write_byte(TE_BEAMENTPOINT)
 	write_short(attacker | 0x1000) 
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	write_short( m_beamSpr ) 
 	write_byte(1) // framestart
 	write_byte(5) // framerate
@@ -144,9 +143,9 @@ public fw_TraceAttack(victim, attacker, Float:damage, Float:direction[3], iTr, d
 	message_begin( MSG_BROADCAST,SVC_TEMPENTITY)
 	write_byte(TE_BEAMENTPOINT)
 	write_short(attacker | 0x1000) 
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	write_short( m_beamSpr ) 
 	write_byte(1) // framestart
 	write_byte(5) // framerate
@@ -163,9 +162,9 @@ public fw_TraceAttack(victim, attacker, Float:damage, Float:direction[3], iTr, d
 	message_begin( MSG_BROADCAST,SVC_TEMPENTITY)
 	write_byte(TE_BEAMENTPOINT)
 	write_short(attacker | 0x1000) 
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	write_short( m_beamSpr ) 
 	write_byte(1) // framestart
 	write_byte(5) // framerate
@@ -182,9 +181,9 @@ public fw_TraceAttack(victim, attacker, Float:damage, Float:direction[3], iTr, d
 	message_begin( MSG_BROADCAST,SVC_TEMPENTITY)
 	write_byte(TE_BEAMENTPOINT)
 	write_short(attacker | 0x1000) 
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	write_short( m_beamSpr ) 
 	write_byte(1) // framestart
 	write_byte(5) // framerate
@@ -202,9 +201,9 @@ public fw_TraceAttack(victim, attacker, Float:damage, Float:direction[3], iTr, d
 	message_begin( MSG_BROADCAST,SVC_TEMPENTITY)
 	write_byte(TE_BEAMENTPOINT)
 	write_short(attacker | 0x1000) 
-	engfunc(EngFunc_WriteCoord, vecEndPos[0])
-	engfunc(EngFunc_WriteCoord, vecEndPos[1])
-	engfunc(EngFunc_WriteCoord, vecEndPos[2])
+	write_coord(vecEndPos[0])
+	write_coord(vecEndPos[1])
+	write_coord(vecEndPos[2])
 	write_short( m_beamSpr ) 
 	write_byte(1) // framestart
 	write_byte(5) // framerate
@@ -218,5 +217,8 @@ public fw_TraceAttack(victim, attacker, Float:damage, Float:direction[3], iTr, d
 	write_byte( 128 ) // speed
 	message_end()
 		
-	return PLUGIN_HANDLED
+	return HAM_IGNORED
 }
+/* AMXX-Studio Notes - DO NOT MODIFY BELOW HERE
+*{\\ rtf1\\ ansi\\ deff0{\\ fonttbl{\\ f0\\ fnil Tahoma;}}\n\\ viewkind4\\ uc1\\ pard\\ lang13322\\ f0\\ fs16 \n\\ par }
+*/
